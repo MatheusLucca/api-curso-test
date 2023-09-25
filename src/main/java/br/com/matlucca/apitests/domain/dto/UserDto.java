@@ -1,5 +1,6 @@
 package br.com.matlucca.apitests.domain.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,5 +16,7 @@ public class UserDto {
     private String name;
 
     private String email;
+
+    @JsonIgnore
     private String password;
 }
