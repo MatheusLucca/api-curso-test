@@ -4,6 +4,7 @@ import br.com.matlucca.apitests.domain.User;
 import br.com.matlucca.apitests.domain.dto.UserDto;
 import br.com.matlucca.apitests.repositories.UserRepository;
 import br.com.matlucca.apitests.services.UserService;
+import br.com.matlucca.apitests.services.exceptions.DataIntegratyViolationException;
 import br.com.matlucca.apitests.services.exceptions.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User create(UserDto obj){
+        findByEmail(obj);
         return repository.save(mapper.map(obj,User.class));
+    }
+
+    private void findByEmail(UserDto obj){
+        Optional<User> user = repository.findByEmail(obj.getEmail());
+        if (user.isPresent()){
+            throw new DataIntegratyViolationException("Email ja cadastrado no sistema");
+        }
     }
 
 }
