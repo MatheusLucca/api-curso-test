@@ -1,7 +1,7 @@
 package br.com.matlucca.apitests.services.impl;
 
 import br.com.matlucca.apitests.domain.User;
-import br.com.matlucca.apitests.domain.dto.UserDto;
+import br.com.matlucca.apitests.domain.dto.UserDTO;
 import br.com.matlucca.apitests.repositories.UserRepository;
 import br.com.matlucca.apitests.services.UserService;
 import br.com.matlucca.apitests.services.exceptions.DataIntegratyViolationException;
@@ -31,14 +31,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User create(UserDto obj){
+    public User create(UserDTO obj){
         findByEmail(obj);
         return repository.save(mapper.map(obj,User.class));
     }
 
-    private void findByEmail(UserDto obj){
+    @Override
+    public User update(UserDTO obj) {
+        findByEmail(obj);
+        return repository.save(mapper.map(obj, User.class));
+    }
+
+    private void findByEmail(UserDTO obj){
         Optional<User> user = repository.findByEmail(obj.getEmail());
-        if (user.isPresent()){
+        if (user.isPresent() && !user.get().getId().equals(obj.getId())){
             throw new DataIntegratyViolationException("Email ja cadastrado no sistema");
         }
     }

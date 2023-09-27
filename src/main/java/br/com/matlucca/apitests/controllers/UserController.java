@@ -1,7 +1,7 @@
 package br.com.matlucca.apitests.controllers;
 
 import br.com.matlucca.apitests.domain.User;
-import br.com.matlucca.apitests.domain.dto.UserDto;
+import br.com.matlucca.apitests.domain.dto.UserDTO;
 import br.com.matlucca.apitests.services.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,20 +23,26 @@ public class UserController {
     @Autowired
     private UserService service;
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserDto> findById(@PathVariable Integer id){
-        return ResponseEntity.ok().body(mapper.map(service.findById(id), UserDto.class));
+    public ResponseEntity<UserDTO> findById(@PathVariable Integer id){
+        return ResponseEntity.ok().body(mapper.map(service.findById(id), UserDTO.class));
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> findAll(){
+    public ResponseEntity<List<UserDTO>> findAll(){
         return ResponseEntity.ok().body(service.findAll()
-                .stream().map(x -> mapper.map(x,UserDto.class)).collect(Collectors.toList()));
+                .stream().map(x -> mapper.map(x, UserDTO.class)).collect(Collectors.toList()));
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> create(@RequestBody UserDto obj) {
+    public ResponseEntity<UserDTO> create(@RequestBody UserDTO obj) {
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}")
                 .buildAndExpand(service.create(obj).getId()).toUri();
         return ResponseEntity.created(uri).build();
+    }
+
+    @PutMapping(value = "/{id}")
+    public ResponseEntity<UserDTO> update(@PathVariable Integer id, @RequestBody UserDTO obj){
+        obj.setId(id);
+        return ResponseEntity.ok().body(mapper.map(service.update(obj), UserDTO.class));
     }
 }
