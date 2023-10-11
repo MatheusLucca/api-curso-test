@@ -3,6 +3,7 @@ package br.com.matlucca.apitests.services.impl;
 import br.com.matlucca.apitests.domain.User;
 import br.com.matlucca.apitests.domain.dto.UserDTO;
 import br.com.matlucca.apitests.repositories.UserRepository;
+import br.com.matlucca.apitests.services.exceptions.ObjectNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,17 @@ class UserServiceImplTest {
         assertEquals(MAIL, response.getEmail());
     }
 
+    @Test
+    void whenFindByIdThenReturnAnObjectNotFoundException() {
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException("Objeto não encontrado"));
+
+        try{
+            service.findById(ID);
+        } catch (Exception ex){
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals("Objeto não encontrado", ex.getMessage());
+        }
+    }
     @Test
     void findAll() {
     }
