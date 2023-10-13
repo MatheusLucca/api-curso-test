@@ -20,7 +20,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class UserServiceImplTest {
@@ -28,7 +28,7 @@ class UserServiceImplTest {
     public static final String NAME = "matheus";
     public static final String MAIL = "matheus@gmail.com";
     public static final String NUMBER = "123";
-    public static final String OBJETO_NÃO_ENCONTRADO = "Objeto não encontrado";
+    public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
     public static final int INDEX = 0;
     public static final String EMAIL_JA_CADASTRADO_NO_SISTEMA = "Email ja cadastrado no sistema";
     @InjectMocks
@@ -37,9 +37,7 @@ class UserServiceImplTest {
     private UserRepository repository;
     @Mock
     private ModelMapper mapper;
-
     private User user;
-
     private UserDTO userDTO;
     private Optional<User> optionalUser;
     @BeforeEach
@@ -63,24 +61,23 @@ class UserServiceImplTest {
 
     @Test
     void whenFindByIdThenReturnAnObjectNotFoundException() {
-        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NÃO_ENCONTRADO));
-
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
         try{
             service.findById(ID);
         } catch (Exception ex){
             assertEquals(ObjectNotFoundException.class, ex.getClass());
-            assertEquals(OBJETO_NÃO_ENCONTRADO, ex.getMessage());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
         }
-
     }
     @Test
     void whenFindAllThenReturnAnListOfUsers() {
         when(repository.findAll()).thenReturn(List.of(user));
+
         List<User> response = service.findAll();
+
         assertNotNull(response);
         assertEquals(1, response.size());
         assertEquals(User.class, response.get(INDEX).getClass());
-
         assertEquals(ID, response.get(INDEX).getId());
         assertEquals(NAME, response.get(INDEX).getName());
         assertEquals(MAIL, response.get(INDEX).getEmail());
@@ -90,7 +87,6 @@ class UserServiceImplTest {
     @Test
     void whenCreateThenReturnSucess() {
         when(repository.save(any())).thenReturn(user);
-
 
         User response = service.create(userDTO);
 
@@ -105,7 +101,6 @@ class UserServiceImplTest {
     @Test
     void whenCreateThenReturnAnDataIntegrityViolationException() {
         when(repository.findByEmail(anyString())).thenReturn(optionalUser);
-
         try{
             optionalUser.get().setId(2);
             service.create(userDTO);
@@ -117,7 +112,6 @@ class UserServiceImplTest {
     @Test
     void whenUpdateThenReturnSucess() {
         when(repository.save(any())).thenReturn(user);
-
 
         User response = service.update(userDTO);
 
@@ -132,7 +126,6 @@ class UserServiceImplTest {
     @Test
     void whenUpdateThenReturnAnDataIntegrityViolationException() {
         when(repository.findByEmail(anyString())).thenReturn(optionalUser);
-
         try{
             optionalUser.get().setId(2);
             service.create(userDTO);
@@ -142,7 +135,22 @@ class UserServiceImplTest {
         }
     }
     @Test
-    void delete() {
+    void deleteWithSucess() {
+        when(repository.findById(anyInt())).thenReturn(optionalUser);
+        doNothing().when(repository).deleteById(anyInt());
+        service.delete(ID);
+        verify(repository, times(1)).deleteById(anyInt());
+    }
+
+    @Test
+    void deleteWithObjectNotFoundException(){
+        when(repository.findById(anyInt())).thenThrow(new ObjectNotFoundException(OBJETO_NAO_ENCONTRADO));
+        try{
+            service.delete(ID);
+        } catch (Exception ex) {
+            assertEquals(ObjectNotFoundException.class, ex.getClass());
+            assertEquals(OBJETO_NAO_ENCONTRADO, ex.getMessage());
+        }
     }
 
     private void startUser(){
