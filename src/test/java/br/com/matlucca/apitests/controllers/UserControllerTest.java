@@ -39,8 +39,8 @@ class UserControllerTest {
     @Mock
     private ModelMapper mapper;
 
-    private User user;
-    private UserDTO userDTO;
+    private User user = new User();
+    private UserDTO userDTO = new UserDTO();
 
 
     @BeforeEach
